@@ -291,10 +291,6 @@ airbnb %>%
   arrange(neighbourhood_group, desc(number_of_properties))
 ```
 
-```{r}
-glimpse(airbnb)
-```
-
 # Basics of `ggplot2`
 
 The `ggplot2` package is the cornerstone of the tidyverse. It represents a simple framework for quickly iterating through the creation of complex, professional visualizations. All `ggplot2` visualizations include a common set of characteristics:
