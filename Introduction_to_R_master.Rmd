@@ -7,8 +7,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Introduction to R
-
 This document contains a walkthrough of how to work with a dataset in `R`. The walkthrough covers several basic skills necessary for performing a data analysis:
 
 * What is Data Science + the role of `R` in data science
@@ -29,7 +27,7 @@ The walkthrough utilizes New York City Airbnb Open Data, which can originally be
 
 # Load Packages
 
-Packages in `R` are stored on [CRAN](https://cran.r-project.org/). The `install.packages` function will download the source code for a package onto your computer. The `library` function function takes the source code for a function and attaches it to the environment that you are working in. You only need to use `install.packages` once on your machine (unless you want to upgrade to a newer version of a package that you are using), whereas you'll need to call the `library` function every time you start up an `R` session. It is considered a best practice to include all of your `library` calls at the beginning of your script. We'll start by loading the `tidyverse` package, which we will discuss further later.
+Packages in `R` are stored on [CRAN](https://cran.r-project.org/). The `install.packages` function will download the source code for a package onto your computer. The `library` function takes the source code for a function and attaches it to the environment that you are working in. You only need to use `install.packages` once on your machine (unless you want to upgrade to a newer version of a package that you are using), whereas you'll need to call the `library` function every time you start up an `R` session. It is considered a best practice to include all of your `library` calls at the beginning of your script. We'll start by loading the `tidyverse` package, which we will discuss further later.
 
 ```{r}
 # install.packages("tidyverse")
@@ -158,7 +156,7 @@ for (column in colnames(airbnb)) {
 
 The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures. You can learn more [here](https://tidyverse.org).
 
-The packages include in the tidyverse are:
+The packages included in the tidyverse are:
 
 * `ggplot2` - for graphing
 * `dplyr` - for data manipulation
