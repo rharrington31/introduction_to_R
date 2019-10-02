@@ -368,3 +368,55 @@ airbnb %>%
   geom_line()
 ```
 
+And sprucing this up a bit as well...
+
+```{r}
+last_review_date_count <- 
+  airbnb %>% 
+  group_by(last_review) %>% 
+  summarize(reviews = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(reviews)) %>% 
+  filter(!is.na(last_review))
+
+last_review_date_count %>% 
+  slice(1)
+
+last_review_date_count %>% 
+  ggplot() +
+  geom_line(aes(x = last_review,
+                y = reviews),
+            color = "#E83536") +
+  geom_label(data = last_review_date_count %>% 
+               filter(last_review <= "2019-01-15") %>% 
+               group_by(format(last_review, format = "%Y")) %>% 
+               filter(reviews == max(reviews)) %>% 
+               ungroup() %>% 
+               filter(format(last_review, format = "%Y") >= 2016) %>% 
+               select(last_review, reviews) %>% 
+               union(last_review_date_count %>% 
+                       slice(1)),
+             aes(x = last_review,
+                 y = reviews,
+                 label = paste0(format(last_review, format = "%b %e, %Y"),
+                                "\n", scales::comma(reviews), " reviews")),
+             size = 2.5,
+             hjust = 1,
+             nudge_x = -20,
+             nudge_y = 20,
+             label.r = unit(0, "lines"),
+             label.size = 0,
+             fill = "#cccccc",
+             alpha = 0.5) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  theme(axis.text = element_text(face = "italic",
+                                 size = 10),
+        axis.title = element_text(face = "bold",
+                                  size = 12),
+        title = element_text(face = "bold",
+                             size = 12)) +
+  labs(x = "Date of Last Review",
+       y = "Number of Properties",
+       title = "Day of Last Review by Property")
+```
