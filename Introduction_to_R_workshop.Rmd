@@ -1,0 +1,363 @@
+---
+title: "Introduction to R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document contains a walkthrough of how to work with a dataset in `R`. The walkthrough covers several basic skills necessary for performing a data analysis:
+
+* What is Data Science + the role of `R` in data science
+* Base `R` vs Tidyverse
+* Markdown vs. Scripts
+* Overview of RStudio console
+* Object assignment `<-`
+* Reading in dataframes (`.csv`) - `readr`
+* Basic analysis of a dataframe - `dim`, `nrow`, `ncol`, `colnames`, `str`, `summary`,  `unique`
+* Basic dataframe manipulation (`df[1:3]`, `df[1:3,]`, `df[1:3,]`, `df[1:3, 1:3]`, `df$column`, `df$column[1:3]`)
+* For loops
+* Piping `%>%`
+* Basic `dplyr` functions for data manipulation - `select`, `filter`, `arrange`, `mutate`, `group_by`, `summarize`, `ungroup`
+* Advanced `tidyr` functions for data manipulation - `spread`, `gather`
+* Basic `ggplot2` - `geom_bar`, `geom_col`, `geom_line`, `geom_point`, `geom_histogram`, `geom_boxplot`
+
+The walkthrough utilizes New York City Airbnb Open Data, which can originally be found via [Kaggle](https://www.kaggle.com/dgomonov/new-york-city-airbnb-open-data/).
+
+# Load Packages
+
+Packages in `R` are stored on [CRAN](https://cran.r-project.org/). The `install.packages` function will download the source code for a package onto your computer. The `library` function takes the source code for a function and attaches it to the environment that you are working in. You only need to use `install.packages` once on your machine (unless you want to upgrade to a newer version of a package that you are using), whereas you'll need to call the `library` function every time you start up an `R` session. It is considered a best practice to include all of your `library` calls at the beginning of your script. We'll start by loading the `tidyverse` package, which we will discuss further later.
+
+```{r}
+# install.packages("tidyverse")
+library(tidyverse)
+```
+
+# Read Data
+
+One of the first steps that you will take on any analysis will be to load data into `R`. There are _many_ ways to do this. As you are beginning, you will most likely load data into `R` from a `.csv` file. As you begin working in a professional environment, you will likely load data into your environment from a database. See [here](https://db.rstudio.com/databases/) for more information.
+
+With base `R`, you can use the `read.csv` function. I personally prefer the `read_csv` function included as part of the `readr` package. The `readr` package was loaded into our environment when we loaded `tidyverse`.
+
+In this case, we're loading a file that is external to our dataset, so we can directly pass the URL that the data is located at to the `read_csv` function. Often, the data will be hosted on your local machine, at which point you will direct `read_csv` to the path that it is located at.
+
+```{r}
+# First we assign the string of the URL to an object called `url`
+url <- "https://raw.githubusercontent.com/rharrington31/introduction_to_R/master/AB_NYC_2019.csv"
+
+# Next, we pass the `url` object to the `read_csv` function and assign it to an object called `airbnb`
+airbnb <- read_csv(url)
+
+# Note that we can pass objects to the parameters in a function without explicitly naming that parameter.
+# The objects are simply passed to the parameters in the order that they are defined.
+# For example, if we look at the vignette of the `read_csv` function (use `?read_csv` in your console)
+# then we will see that `file` is the first parameter in the function. For this reason, what we wrote
+# is equivalent to the following:
+airbnb <- read_csv(file = url)
+```
+
+# Explore Data
+
+`R` has many built in functions that help to tell the story of a dataset. Some are focused around understanding the size and shape of a dataset. 
+
+```{r}
+# How many rows and columns are in the dataframe?
+
+
+# How many rows are in the dataframe?
+
+
+# How many columns are in the dataframe?
+
+
+# What are the names of the columns in the dataframe?
+
+```
+
+Some help us determine the overall structure of the dataset.
+
+```{r}
+
+```
+
+The Tidyverse includes an alternate function to determine the structure as well.
+
+```{r}
+
+```
+
+We may also want to get a simple summary of the data.
+
+```{r}
+
+```
+
+In addition, we can begin to explore individual columns or rows in a dataset.
+
+```{r}
+# View the whole dataset
+
+
+# View the first or last 6 rows of a dataset
+
+
+
+# View the first three columns
+
+
+# View the first three columns
+
+
+# View the first three rows
+
+
+# View the first and third row
+
+
+# View the first three rows of the first three columns
+
+
+# View the list of elements that make up the column called `host_id`
+
+
+# View the first three items in the list of elements of the column called `host_id`
+
+```
+
+Understand the unique values in a column of a dataset.
+
+```{r}
+
+```
+
+What if you wanted to find how many unique values there are for every column in the dataset? We can consider using a loop (though there are many alternate, and better, approaches). Specifically, after you find yourself more comfortable with `R`, you should explore functional programming with the `purrr` package.
+
+```{r}
+# Here's one option, iterating through columns by index number
+
+```
+
+```{r}
+# And another option, iterating through columns by name
+
+```
+
+
+# Intro to the Tidyverse
+
+The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures. You can learn more [here](https://tidyverse.org).
+
+The packages included in the tidyverse are:
+
+* `ggplot2` - for graphing
+* `dplyr` - for data manipulation
+* `tidyr` - for creating "tidy" data
+* `readr` - for reading rectangular data
+* `purrr` - for functional programming
+* `tibble` - a re-imagining of the dataframe
+* `stringr` - for manipulating strings
+* `forcats` - for working with factors
+
+These packages are built with the idea of making it easier to quickly iterate through data analysis work.
+
+One key aspect of the tidyverse style is its use of "pipes". You'll see these in code as `%>%`. You can think of a pipe as simply meaning "and then". Consider the next two examples. First, use the console to look up the vignette for the `select` function. Either of these commands will work:
+
+* `?select`
+* `?dplyr::select`
+
+Note the parameters that are passed to the function. What is the first one?
+
+Let's use the `select` function to select the `id`, `neighbourhood_group`, and `price` fields. First, we write it in the traditional way.
+
+```{r}
+
+```
+
+By using pipes, we are able to more quickly iterate and more logically see the transformations that we're applying to the data. Let's do the same exercise as above, but by using the `%>%` pipe.
+
+```{r}
+
+```
+
+The value of piping becomes more clear when we want to apply several transformations to our data. Let's apply the same `select` statement as we did previously. However, we also want to `filter` our data so that we only see observations from Manhattan.
+
+First, we can do this without piping.
+
+```{r}
+
+```
+
+Next, we can do this with piping.
+
+```{r}
+
+```
+
+The order that we're doing our work in is much more apparent, which makes it significantly easier to iterate quickly. This lets us quickly iterate to answer questions. For example, we might want to know what the most expensive Airbnb properties in Manhattan are. We can do this by including the `arrange` function in our code:
+
+```{r}
+
+```
+
+Sometimes, we may want to make new variables in our dataset (or make adjustments to ones that already exist). For that, we use the `mutate` function. When we use the `mutate` function, we will end up with the same number of observations in our dataset as what we started with. In addition, when we use `mutate` all of our original variables will still exist.
+
+This could help us answer questions like "what is the minimum price for a stay at each Airbnb location?" To do this, we'll want to `mutate` the `price` and `minimum_nights` variables into a new variable called `minimum_stay_price`.
+
+```{r}
+
+```
+
+Other times, we might want to `summarize` our data. When we `summarize` data, we will reduce the number of observations in our dataset to however many groups (or group combinations) there are. In addition, when we use `summarize`, the only variables that exist are the ones that we have created.
+
+For example, we might want to know the median price of Airbnbs.
+
+```{r}
+
+
+# Note, this is equivalent to median(airbnb$price)
+```
+
+To fully unlock the power of `summarize`, it needs to be paired with the `group_by` function. This lets us ask much more complex questions. When we use `summarize` with `group_by`, our final dataframe will include any variables used within the `group_by` function in addition to the variables that we created from the `summarize` function.
+
+What if we wanted to know the median price by neighbourhood group?
+
+```{r}
+
+```
+
+Note that we use `ungroup` once we're done with any functions that require us to use `group_by`. Think of these as book ends. They should always be used with each other. You can end up with strange results that are difficult to troubleshoot without closing out your `group_by` function with an `ungroup`.
+
+We can include multiple summaries into one `summarize` statement. For example, what if we wanted to know how the mean price by neighbourhood group compares to the median price?
+
+```{r}
+
+```
+
+We can use `summarize` and `mutate` functions in tandem with each other. Let's find the median price and mean price by neighborhood group and then determine which neighborhood group has the largest difference between those values.
+
+```{r}
+
+```
+
+It is possible to use _multiple_ fields in the `group_by` function. For example, let's see how our previous analysis changes if we consider the `room_type` within each `neighbourhood_group`.
+
+```{r}
+
+```
+
+What if we want to know which room type is most common in each neighbourhood group?
+
+```{r}
+
+```
+
+# Basics of `ggplot2`
+
+The `ggplot2` package is the cornerstone of the tidyverse. It represents a simple framework for quickly iterating through the creation of complex, professional visualizations. All `ggplot2` visualizations include a common set of characteristics:
+
+* *data* - what data is being used to build the layer?
+* *mapping* - what field(s) from the data are being used to build the layer?
+* *geometry* - what shape should our data take when building the layer?
+* *statistic* - how should our data be transformed when building the layer?
+* *position* - where should our data be placed when building the layer?
+
+The `ggplot2` package can be loaded separately or as part of the tidyverse.
+
+Let's go back to answering a question that we already have:
+
+> What if we wanted to know the median price by neighbourhood group?
+
+While we ended up with an answer to this question, we would be better served by visualizing it.
+
+```{r}
+
+```
+
+Here's the same thing, but with some window dressing put on it.
+
+```{r}
+airbnb %>% 
+  group_by(neighbourhood_group) %>% 
+  summarize(median_price = median(price)) %>% 
+  ungroup() %>% 
+  mutate(neighbourhood_group = fct_reorder(neighbourhood_group, median_price)) %>% 
+  ggplot(aes(x = neighbourhood_group,
+             y = median_price)) +
+  geom_col(fill = "#E83536") +
+  geom_label(aes(label = scales::dollar(median_price)),
+             hjust = -0.2,
+             size = 3) +
+  scale_y_continuous(labels = scales::dollar) +
+  theme_minimal() +
+  theme(axis.text = element_text(face = "italic",
+                                 size = 10),
+        axis.title = element_text(face = "bold",
+                                  size = 12),
+        title = element_text(face = "bold",
+                             size = 12)) +
+  expand_limits(y = 160) +
+  coord_flip() +
+  labs(x = "",
+       y = "Median Price",
+       title = "Median Price by Neighbourhood Group")
+```
+
+How about if there are any patterns around a most common day to have received a `last_review`?
+
+```{r}
+
+```
+
+And sprucing this up a bit as well...
+
+```{r}
+last_review_date_count <- 
+  airbnb %>% 
+  group_by(last_review) %>% 
+  summarize(reviews = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(reviews)) %>% 
+  filter(!is.na(last_review))
+
+last_review_date_count %>% 
+  slice(1)
+
+last_review_date_count %>% 
+  ggplot() +
+  geom_line(aes(x = last_review,
+                y = reviews),
+            color = "#E83536") +
+  geom_label(data = last_review_date_count %>% 
+               filter(last_review <= "2019-01-15") %>% 
+               group_by(format(last_review, format = "%Y")) %>% 
+               filter(reviews == max(reviews)) %>% 
+               ungroup() %>% 
+               filter(format(last_review, format = "%Y") >= 2016) %>% 
+               select(last_review, reviews) %>% 
+               union(last_review_date_count %>% 
+                       slice(1)),
+             aes(x = last_review,
+                 y = reviews,
+                 label = paste0(format(last_review, format = "%b %e, %Y"),
+                                "\n", scales::comma(reviews), " reviews")),
+             size = 2.5,
+             hjust = 1,
+             nudge_x = -20,
+             nudge_y = 20,
+             label.r = unit(0, "lines"),
+             label.size = 0,
+             fill = "#cccccc",
+             alpha = 0.5) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  theme(axis.text = element_text(face = "italic",
+                                 size = 10),
+        axis.title = element_text(face = "bold",
+                                  size = 12),
+        title = element_text(face = "bold",
+                             size = 12)) +
+  labs(x = "Date of Last Review",
+       y = "Number of Properties",
+       title = "Day of Last Review by Property")
+```
