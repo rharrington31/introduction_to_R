@@ -374,9 +374,6 @@ last_review_date_count <-
   filter(!is.na(last_review))
 
 last_review_date_count %>% 
-  slice(1)
-
-last_review_date_count %>% 
   ggplot() +
   geom_line(aes(x = last_review,
                 y = reviews),
